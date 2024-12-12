@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "SignalR Notifications";
+}
+
+<h2>SignalR Notifications</h2>
+<div id="notifications"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+<script>
+    // SignalR connection
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/notificationsHub") // Match the hub route on your server
+        .build();
+
+    // Listen for notifications
+    connection.on("ReceiveNotification", (message) => {
+        console.log("Notification:", message);
+        const notificationDiv = document.getElementById("notifications");
+        const messageElement = document.createElement("p");
+        messageElement.textContent = message;
+        notificationDiv.appendChild(messageElement);
+    });
+
+    // Start the connection
+    connection.start()
+        .then(() => {
+            console.log("Connected to NotificationsHub");
+            connection.invoke("TestWebSocketEcho") // Call the hub method
+                .catch(err => console.error("Error invoking method:", err));
+        })
+        .catch(err => console.error("Error connecting:", err));
+</script>
