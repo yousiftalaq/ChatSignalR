@@ -3,30 +3,85 @@
 }
 
 <h2>SignalR Notifications</h2>
+
+<!-- Div for notifications from ReceiveNotification -->
 <div id="notifications"></div>
 
+<!-- Div for displaying the message from SendMessage -->
+<div id="messagesend"></div>
+
+<!-- Include the SignalR library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+<button id="sendButton">Send Message</button>
+
 <script>
-    // SignalR connection
+        document.getElementById("sendButton").addEventListener("click", () => {
+        connection.invoke("SendMessage", "Button Test")
+            .then(response => console.log("Response from server:", response))
+            .catch(err => console.error("Error sending message:", err));
+    });
+    // Initialize SignalR connection
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/notificationsHub") // Match the hub route on your server
+        .withUrl("/notificationsHub") // Adjust this to your server hub endpoint
         .build();
 
-    // Listen for notifications
+    // Listen for server-side "ReceiveNotification" events
     connection.on("ReceiveNotification", (message) => {
-        console.log("Notification:", message);
+        console.log("Notification received:", message);
         const notificationDiv = document.getElementById("notifications");
         const messageElement = document.createElement("p");
         messageElement.textContent = message;
         notificationDiv.appendChild(messageElement);
     });
 
-    // Start the connection
+    // Start the SignalR connection
     connection.start()
         .then(() => {
             console.log("Connected to NotificationsHub");
-            connection.invoke("TestWebSocketEcho") // Call the hub method
-                .catch(err => console.error("Error invoking method:", err));
+
+            // Call TestWebSocketEcho method
+            connection.invoke("TestWebSocketEcho")
+                .then(() => console.log("TestWebSocketEcho invoked successfully"))
+                .catch(err => console.error("Error invoking TestWebSocketEcho:", err));
+
+            // Call SendMessage method
+            connection.invoke("SendMessage", "API")
+                .then((messageapi) => {
+                   // debugger
+                    console.log("SendMessage result:", messageapi);
+
+                    // Ensure the "messagesend" div exists
+                    const messagesendDiv = document.getElementById("messagesend");
+                    if (messagesendDiv) {
+                        // Create a new paragraph to display the message
+                        const messageElement = document.createElement("p");
+                        messageElement.textContent = messageapi || "No response from server.";
+                        messagesendDiv.appendChild(messageElement);
+                    } else {
+                        console.error("messagesend div not found in the DOM.");
+                    }
+                })
+                .catch(err => console.error("Error invoking SendMessage:", err));
+
+
+
+                 connection.invoke("SM", "API")
+                .then((messageapi) => {
+                  //  debugger
+                    console.log("SendMessage result:", messageapi);
+
+                    // Ensure the "messagesend" div exists
+                    const messagesendDiv = document.getElementById("messagesend");
+                    if (messagesendDiv) {
+                        // Create a new paragraph to display the message
+                        const messageElement = document.createElement("p");
+                        messageElement.textContent = messageapi || "No response from server.";
+                        messagesendDiv.appendChild(messageElement);
+                    } else {
+                        console.error("messagesend div not found in the DOM.");
+                    }
+                })
+                .catch(err => console.error("Error invoking SendMessage:", err));
         })
-        .catch(err => console.error("Error connecting:", err));
+        .catch(err => console.error("Error connecting to the hub:", err));
 </script>

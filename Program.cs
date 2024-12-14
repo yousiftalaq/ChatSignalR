@@ -10,7 +10,8 @@ Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("http://192.168.3.102:5031")
+        builder.WithOrigins("http://192.168.137.1:5031")
+        //WithOrigins("http://192.168.3.102:5031")
        .AllowAnyHeader()
        .AllowAnyMethod()
        .AllowCredentials();
@@ -39,6 +40,7 @@ app.UseRouting();
 app.UseAuthorization();
 //app.MapHub<ChatHub>("/chat");
 app.MapHub<NotificationsHub>("/notificationsHub"); // SignalR Hub
+
 
 app.MapControllerRoute(
     name: "default",

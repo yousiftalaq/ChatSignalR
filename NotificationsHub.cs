@@ -20,7 +20,18 @@ namespace ChatSignalR
 
             //await Clients.All.SendAsync("ReceiveNotification", $"{Context.User.Identity.Name} This is a test message from the server.");
             await Clients.All.SendAsync("ReceiveNotification", $"Your IP Address is: {clientIpAddress}");
+            //await Clients.All.SendAsync("ReceiveNotification", $"Your Messages is: {Messages}");
+        }
 
+        public async Task SendMessage(string message)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", message);
+           
+        }
+
+        public string SM(string message)
+        {
+            return message;
         }
     }
 
